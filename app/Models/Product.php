@@ -78,7 +78,7 @@ class Product extends Model
         'availability'       => 'integer',
         'availability_cy'    => 'integer',
         'minquantity'        => 'integer',
-        'weight'             => 'decimal:2',
+        'weihgt'             => 'decimal:2',
     ];
 
     public function category()
@@ -88,7 +88,7 @@ class Product extends Model
 
     public function supplier()
     {
-        return $this->belongsTo(Supplier::class, 'supplier_id');
+        return $this->belongsTo(AdminUser::class, 'supplier_id');
     }
 
     public function productImages()

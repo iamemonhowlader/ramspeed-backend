@@ -21,13 +21,16 @@ class AdminExpenseController extends Controller
     {
         $query = Expense::query();
 
-        if ($request->filled(['fYear', 'fMonth', 'fDay', 'tYear', 'tMonth', 'tDay'])) {
-            $from = "{$request->fYear}-{$request->fMonth}-{$request->fDay}";
-            $to = "{$request->tYear}-{$request->tMonth}-{$request->tDay} 23:59:59";
-            $query->whereBetween('date', [$from, $to]);
+        // Date range filter
+        if ($request->filled('from')) {
+            $query->whereDate('date', '>=', $request->from);
+        }
+        if ($request->filled('to')) {
+            $query->whereDate('date', '<=', $request->to);
         }
 
-        if ($request->filled('type') && $request->type != 0) {
+        // Type filter
+        if ($request->filled('type') && $request->type != '0' && $request->type != 'all') {
             $query->where('type', $request->type);
         }
 
@@ -42,15 +45,19 @@ class AdminExpenseController extends Controller
             });
         }
 
-        $expenses = $query->with('supplier')->orderBy('date', 'desc')->get();
+        // Calculate Stats based on the filtered query (without pagination)
+        $statsQuery = clone $query;
+        $allFilteredExpenses = $statsQuery->get();
 
         $stats = [
-            'total_gross' => $expenses->where('cancelled', 0)->sum('GROSS'),
-            'vat_19' => $expenses->where('cancelled', 0)->where('VAT', 0.19)->sum('Calculated_VAT'),
-            'vat_9' => $expenses->where('cancelled', 0)->where('VAT', 0.09)->sum('Calculated_VAT'),
-            'vat_5' => $expenses->where('cancelled', 0)->where('VAT', 0.05)->sum('Calculated_VAT'),
-            'service_receipt_gross' => $expenses->where('cancelled', 0)->where('Service_Receipt', 0)->sum('GROSS')
+            'total_gross' => $allFilteredExpenses->where('cancelled', 0)->sum('GROSS'),
+            'vat_19' => $allFilteredExpenses->where('cancelled', 0)->where('VAT', 0.19)->sum('Calculated_VAT'),
+            'vat_9' => $allFilteredExpenses->where('cancelled', 0)->where('VAT', 0.09)->sum('Calculated_VAT'),
+            'vat_5' => $allFilteredExpenses->where('cancelled', 0)->where('VAT', 0.05)->sum('Calculated_VAT'),
+            'service_receipt_gross' => $allFilteredExpenses->where('cancelled', 0)->where('Service_Receipt', 0)->sum('GROSS')
         ];
+
+        $expenses = $query->with('supplier')->orderBy('date', 'desc')->paginate(50);
 
         return response()->json([
             'success' => true,

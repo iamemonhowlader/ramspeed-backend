@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\AdminOrderController;
 use App\Http\Controllers\Admin\AdminSupplierController;
 use App\Http\Controllers\Admin\AdminMemberController;
 use App\Http\Controllers\Admin\AdminExpenseController;
+use App\Http\Controllers\Admin\AdminMenuController;
 
 /*
 |--------------------------------------------------------------------------
@@ -60,14 +61,29 @@ Route::prefix('frontend')->group(function () {
 Route::prefix('admin')->group(function () {
     // Product Management
     Route::get('/products', [AdminProductController::class, 'index']);
+    Route::get('/products/{id}', [AdminProductController::class, 'show']);
+    Route::get('/dashboard-data', [AdminProductController::class, 'dashboardData']);
     Route::post('/products/store', [AdminProductController::class, 'store']);
     Route::post('/products/update/{id}', [AdminProductController::class, 'update']);
+    Route::delete('/products/delete/{id}', [AdminProductController::class, 'destroy']);
+    
+    // Menu Management
+    Route::get('/menu', [AdminMenuController::class, 'index']);
+    Route::get('/menu/{id}', [AdminMenuController::class, 'show']);
+    Route::post('/menu/store', [AdminMenuController::class, 'store']);
+    Route::post('/menu/update/{id}', [AdminMenuController::class, 'update']);
+    Route::delete('/menu/delete/{id}', [AdminMenuController::class, 'destroy']);
     
     // Order Management
     Route::get('/orders', [AdminOrderController::class, 'index']);
     Route::get('/orders/{id}', [AdminOrderController::class, 'show']);
-    Route::post('/orders/toggle-cancel', [AdminOrderController::class, 'toggleCancel']);
-    Route::post('/orders/toggle-shipping', [AdminOrderController::class, 'toggleShipping']);
+    Route::post('/orders/toggle-cancel/{id}', [AdminOrderController::class, 'toggleCancel']);
+    Route::post('/orders/toggle-shipping/{id}', [AdminOrderController::class, 'toggleShipping']);
+    Route::post('/orders/toggle-status/{id}', [AdminOrderController::class, 'toggleStatus']);
+    Route::get('/orders/invoice/{id}', [AdminOrderController::class, 'invoice']);
+    Route::get('/orders/pdf/{id}', [AdminOrderController::class, 'pdf']);
+    Route::get('/orders-export/pdf', [AdminOrderController::class, 'exportPdf']);
+    Route::get('/orders-export/trial-balance', [AdminOrderController::class, 'trialBalance']);
     Route::post('/orders/add-extra-product/{orderId}', [AdminOrderController::class, 'addExtraProduct']);
     
     // Supplier Management

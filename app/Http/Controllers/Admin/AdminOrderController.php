@@ -47,9 +47,6 @@ class AdminOrderController extends Controller
             $query->whereDate('date', '<=', $request->to);
         }
 
-        // Active orders (Completed or Pending Bank Transfer)
-        $query->active();
-
         $orders = $query->orderBy('id', 'desc')->paginate(50);
 
         // Calculate Stats
@@ -64,14 +61,12 @@ class AdminOrderController extends Controller
 
     protected function calculateStats(Request $request)
     {
-        // Total Sales (Active & Not Cancelled)
-        $totalSales = Order::active()
-            ->where('cancelled', 'no')
+        // Total Sales (All non-cancelled orders)
+        $totalSales = Order::where('cancelled', 'no')
             ->sum('grand_total');
 
         // Estimated Profit
-        $activeOrders = Order::active()
-            ->where('cancelled', 'no')
+        $activeOrders = Order::where('cancelled', 'no')
             ->with('orderItems.product')
             ->get();
 

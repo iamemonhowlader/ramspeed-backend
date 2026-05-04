@@ -184,11 +184,139 @@ class AuthController extends Controller
 
         $member = Member::create($memberData);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Registration successful! Please check your email for confirmation.',
-            'data' => $member
-        ]);
+        // Newsletter subscription logic (Legacy matched)
+        if ($request->subscribe === 'yes') {
+            $exists = DB::table('subscribers')->where('mail_adresse', $request->email)->exists();
+            if (!$exists) {
+                $subscriberId = DB::table('subscribers')->insertGetId([
+                    'mail_adresse' => $request->email,
+                    'notes' => '',
+                    'created' => now(),
+                    'deleted' => '1',
+                    'first_name' => '',
+                    'last_name' => '',
+                    'custom1' => 'Unconfirmed',
+                    'custom2' => '',
+                    'custom3' => '',
+                    'custom4' => '',
+                    'unsubscribe_code' => $key,
+                ]);
+
+                // category_id: 3 for member, 4 for wholesaler
+                $categoryId = ($type == 'wholesaler') ? 4 : 3;
+                DB::table('categories_subscribers')->insert([
+                    'category_id' => $categoryId,
+                    'subscriber_id' => $subscriberId,
+                ]);
+            }
+        }
+
+        // Email logic (Legacy matched)
+        if ($type == 'wholesaler') {
+            $htmlMessage = '
+            <html>
+            <head>
+            <title>New wholesaler registration</title>
+            <style>
+            html, body, div, span, h1, h2, h3, h4, h5, h6, p, font, ul, ol, dl, li, blockquote, pre, form, fieldset, label, legend, input, input, a {margin:0; padding:0px; border:0; outline:0; vertical-align:baseline;}
+            :focus {outline:0;}
+            ul, ol {list-style:none;}
+            img {outline:0; border:0;}
+            a img {border:0;}
+            body {background:#fff; font-family:Helvetica; color:#808080; font-size:14px; padding:10px;}
+            a {color:#09F; text-decoration: none;}
+            a:hover {color:#09F; text-decoration: underline;}
+            .black {color:#000;}
+            .nt {color:#b1b1b1; font-size:22px;}
+            .cms {color:#808080; font-size:10px; padding-top:5px;}
+            </style>
+            </head>
+            <body>
+            <table cellpadding="10" cellspacing="0" border="0" width="100%">
+            <tr>
+            <td colspan="2" bgcolor="#efefef">
+            <span class="black">
+            You have a new wholesaler registration on your website. <br /> Information are listed below</span>
+            </td>
+            </tr>
+            <tr>
+            <td colspan="2" bgcolor="#f7f7f7">
+            <table cellpadding="2" cellspacing="0" border="0">
+            <tr><td valign="top">Company Name:</td><td valign="top">'.$request->full_name.'</td></tr>
+            <tr><td valign="top">Contact Person:</td><td valign="top">'.$request->cperson.'</td></tr>
+            <tr><td valign="top">Username:</td><td valign="top">'.$request->username.'</td></tr>
+            <tr><td valign="top">Email:</td><td valign="top">'.$request->email.'</td></tr>
+            <tr><td valign="top">Address:</td><td valign="top">'.$request->address.'</td></tr>
+            <tr><td valign="top">Post Code:</td><td valign="top">'.$request->post_code.'</td></tr>
+            <tr><td valign="top">City:</td><td valign="top">'.$request->city.'</td></tr>
+            <tr><td valign="top">Country:</td><td valign="top">'.$request->country.'</td></tr>
+            <tr><td valign="top">Phone:</td><td valign="top">'.$request->phone.'</td></tr>
+            <tr><td valign="top">Fax:</td><td valign="top">'.$request->fax.'</td></tr>
+            <tr><td valign="top">VAT Number:</td><td valign="top">'.$request->vat_num.'</td></tr>
+            <tr><td valign="top"></td><td valign="top">Please note that the user status has been set to inactive and you have to review his info from the administration pannel and set it to active if you approve the current wholesaler. Also, if you approved the wholesaler, you have to contact him and inform him about his account approval.</td></tr>
+            </table>
+            </td>
+            </tr>
+            </table>
+            </body>
+            </html>';
+
+            \Illuminate\Support\Facades\Mail::html($htmlMessage, function ($message) {
+                $message->to('info@ramspeedcy.com')
+                        ->subject('New wholesaler registration');
+            });
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Registration successful! Your account is pending approval.',
+                'data' => $member
+            ]);
+        } else {
+            $htmlMessage = '
+            <html>
+            <head>
+            <style>
+            html, body, div, span, h1, h2, h3, h4, h5, h6, p, font, ul, ol, dl, li, blockquote, pre, form, fieldset, label, legend, input, input, a {margin:0; padding:0px; border:0; outline:0; vertical-align:baseline;}
+            :focus {outline:0;}
+            ul, ol {list-style:none;}
+            img {outline:0; border:0;}
+            a img {border:0;}
+            body {background:#fff; font-family:Helvetica; color:#808080; font-size:14px; padding:10px;}
+            a {color:#09F; text-decoration: none;}
+            a:hover {color:#09F; text-decoration: underline;}
+            .black {color:#000;}
+            .nt {color:#b1b1b1; font-size:22px;}
+            .cms {color:#808080; font-size:10px; padding-top:5px;}
+            </style>
+            </head>
+            <body>
+            <table cellpadding="10" cellspacing="0" border="0" width="100%">
+            <tr>
+            <td colspan="2" bgcolor="#efefef">
+            <span class="black">
+            Thank you for your registration</span>
+            </td>
+            </tr>
+            <tr>
+            <td colspan="2" bgcolor="#f7f7f7">
+            Please <a href="https://ramspeedcy.com/registration_confirm.php?email='.$request->email.'&key='.$key.'&lng=en">click here</a> to confirm your email address.
+            </td>
+            </tr>
+            </table>
+            </body>
+            </html>';
+
+            \Illuminate\Support\Facades\Mail::html($htmlMessage, function ($message) use ($request) {
+                $message->to($request->email)
+                        ->subject('Member Registration');
+            });
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Registration successful! Please check your email to confirm your account.',
+                'data' => $member
+            ]);
+        }
     }
 
     public function logout()

@@ -38,4 +38,13 @@ class AdminUser extends Authenticatable implements JWTSubject
             'source_table' => 'admin_users'
         ];
     }
+
+    /**
+     * The supplier's extended info stored in suppliers_info table.
+     * Linked via suppliers_info.user_id = admin_users.id
+     */
+    public function supplierInfo()
+    {
+        return $this->hasOne(Supplier::class, 'user_id');
+    }
 }

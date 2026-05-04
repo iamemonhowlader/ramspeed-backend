@@ -1,0 +1,113 @@
+{
+	"info": {
+		"_postman_id": "8a2f1b3c-5d6e-4f7a-8b9c-0d1e2f3a4b5c",
+		"name": "Ramspeed Laravel API",
+		"description": "Standard Postman Collection for Ramspeed Laravel Migration",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Member Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{ "key": "username", "value": "testuser", "type": "text" },
+								{ "key": "password", "value": "123456", "type": "text" }
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/login/member",
+							"host": ["{{base_url}}"],
+							"path": ["api", "login", "member"]
+						}
+					}
+				},
+				{
+					"name": "Admin Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{ "key": "username", "value": "admin", "type": "text" },
+								{ "key": "password", "value": "admin123", "type": "text" }
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/login/admin",
+							"host": ["{{base_url}}"],
+							"path": ["api", "login", "admin"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Frontend Shop",
+			"item": [
+				{
+					"name": "Product List",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/frontend/products",
+							"host": ["{{base_url}}"],
+							"path": ["api", "frontend", "products"]
+						}
+					}
+				},
+				{
+					"name": "Add To Cart",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{ "key": "product_id", "value": "1", "type": "text" },
+								{ "key": "quantity", "value": "1", "type": "text" },
+								{ "key": "store_type", "value": "1", "type": "text" }
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/frontend/cart/add",
+							"host": ["{{base_url}}"],
+							"path": ["api", "frontend", "cart", "add"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Admin Panel",
+			"item": [
+				{
+					"name": "Order List",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/admin/orders",
+							"host": ["{{base_url}}"],
+							"path": ["api", "admin", "orders"]
+						}
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000"
+		}
+	]
+}

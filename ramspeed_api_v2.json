@@ -1,0 +1,42 @@
+{
+	"info": {
+		"_postman_id": "8a2f1b3c-5d6e-4f7a-8b9c-0d1e2f3a4b5c",
+		"name": "Ramspeed API v2",
+		"description": "Standard Postman Collection for Ramspeed Laravel Migration",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Member Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{ "key": "username", "value": "MYSHOP2003", "type": "text" },
+								{ "key": "password", "value": "MYSHOP200374", "type": "text" }
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/login/member",
+							"host": ["{{base_url}}"],
+							"path": ["api", "login", "member"]
+						}
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://ramspeed-laravel-api.test"
+		}
+	]
+}

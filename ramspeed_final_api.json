@@ -1,0 +1,117 @@
+{
+	"info": {
+		"_postman_id": "final-ramspeed-laravel-api",
+		"name": "Ramspeed Final API Collection",
+		"description": "Complete API documentation for Ramspeed Laravel Migration including Frontend and Admin suites.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Member Login",
+					"request": {
+						"method": "POST",
+						"header": [ { "key": "Accept", "value": "application/json" } ],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{ "key": "username", "value": "MYSHOP2003", "type": "text" },
+								{ "key": "password", "value": "MYSHOP200374", "type": "text" }
+							]
+						},
+						"url": { "raw": "{{base_url}}/api/login/member", "host": ["{{base_url}}"], "path": ["api", "login", "member"] }
+					}
+				},
+				{
+					"name": "Admin Login",
+					"request": {
+						"method": "POST",
+						"header": [ { "key": "Accept", "value": "application/json" } ],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{ "key": "username", "value": "admin", "type": "text" },
+								{ "key": "password", "value": "admin123", "type": "text" }
+							]
+						},
+						"url": { "raw": "{{base_url}}/api/login/admin", "host": ["{{base_url}}"], "path": ["api", "login", "admin"] }
+					}
+				}
+			]
+		},
+		{
+			"name": "Frontend Shop",
+			"item": [
+				{
+					"name": "Product List",
+					"request": {
+						"method": "GET",
+						"header": [ { "key": "Accept", "value": "application/json" } ],
+						"url": { "raw": "{{base_url}}/api/frontend/products", "host": ["{{base_url}}"], "path": ["api", "frontend", "products"] }
+					}
+				},
+				{
+					"name": "Product Detail",
+					"request": {
+						"method": "GET",
+						"header": [ { "key": "Accept", "value": "application/json" } ],
+						"url": { "raw": "{{base_url}}/api/frontend/products/1", "host": ["{{base_url}}"], "path": ["api", "frontend", "products", "1"] }
+					}
+				},
+				{
+					"name": "Add To Cart",
+					"request": {
+						"method": "POST",
+						"header": [ { "key": "Accept", "value": "application/json" } ],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{ "key": "product_id", "value": "1", "type": "text" },
+								{ "key": "quantity", "value": "1", "type": "text" },
+								{ "key": "store_type", "value": "1", "type": "text" }
+							]
+						},
+						"url": { "raw": "{{base_url}}/api/frontend/cart/add", "host": ["{{base_url}}"], "path": ["api", "frontend", "cart", "add"] }
+					}
+				}
+			]
+		},
+		{
+			"name": "Admin Panel",
+			"item": [
+				{
+					"name": "Get Orders",
+					"request": {
+						"method": "GET",
+						"header": [ { "key": "Accept", "value": "application/json" } ],
+						"url": { "raw": "{{base_url}}/api/admin/orders", "host": ["{{base_url}}"], "path": ["api", "admin", "orders"] }
+					}
+				},
+				{
+					"name": "Get Members",
+					"request": {
+						"method": "GET",
+						"header": [ { "key": "Accept", "value": "application/json" } ],
+						"url": { "raw": "{{base_url}}/api/admin/members", "host": ["{{base_url}}"], "path": ["api", "admin", "members"] }
+					}
+				},
+				{
+					"name": "Get Expenses",
+					"request": {
+						"method": "GET",
+						"header": [ { "key": "Accept", "value": "application/json" } ],
+						"url": { "raw": "{{base_url}}/api/admin/expenses", "host": ["{{base_url}}"], "path": ["api", "admin", "expenses"] }
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://ramspeed-laravel-api.test"
+		}
+	]
+}

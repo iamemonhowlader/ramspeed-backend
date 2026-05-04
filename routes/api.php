@@ -49,6 +49,7 @@ Route::prefix('frontend')->group(function () {
     Route::get('/account', [AccountController::class, 'index']);
     Route::post('/account/update', [AccountController::class, 'update']);
     Route::get('/clients', [AccountController::class, 'getClients']);
+    Route::get('/orders', [AccountController::class, 'getOrders']);
 
     Route::post('/checkout/save', [CheckoutController::class, 'saveOrder']);
     Route::get('/payment/success', [PaymentController::class, 'success'])->name('payment.success');

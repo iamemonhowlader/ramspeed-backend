@@ -33,21 +33,29 @@ class AccountController extends Controller
         $user = $this->getAuthenticatedUser();
         if (!$user) return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
 
+        if ($request->filled('password')) {
+            if (!$request->filled('current_password')) {
+                return response()->json(['success' => false, 'message' => 'Current password is required to set a new password'], 422);
+            }
+            if (!\Illuminate\Support\Facades\Hash::check($request->current_password, $user->password)) {
+                return response()->json(['success' => false, 'message' => 'Current password does not match'], 422);
+            }
+        }
+
         if ($user instanceof Member) {
             $data = $request->only(['full_name', 'email', 'phone', 'address', 'city', 'post_code', 'country']);
             
-            // Handle Wholesaler specific fields
             if ($user->type == 'wholesaler') {
                 $data = array_merge($data, $request->only(['cperson', 'vat_num', 'company_reg_num', 'website']));
             }
             if ($request->filled('password')) {
-                $data['password'] = $request->password;
+                $data['password'] = bcrypt($request->password);
             }
             $user->update($data);
         } else {
             $data = $request->only(['full_name', 'email']);
             if ($request->filled('password')) {
-                $data['password'] = $request->password;
+                $data['password'] = bcrypt($request->password);
             }
             $user->update($data);
         }
@@ -68,5 +76,22 @@ class AccountController extends Controller
 
         $clients = Member::whereIn('type', ['client', 'wholesaler'])->where('active', 'yes')->orderBy('full_name')->get(['id', 'full_name', 'address', 'city', 'post_code', 'country', 'email', 'phone', 'type', 'vat_num']);
         return response()->json(['success' => true, 'data' => $clients]);
+    }
+
+    public function getOrders()
+    {
+        $user = $this->getAuthenticatedUser();
+        if (!$user) return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
+
+        $memberId = ($user instanceof Member) ? $user->id : 0;
+        
+        $orders = \App\Models\Order::where('member_id', $memberId)
+            ->with(['items.product' => function($query) {
+                $query->select('id', 'name', 'code')->with('productImages');
+            }])
+            ->orderBy('date', 'desc')
+            ->get();
+
+        return response()->json(['success' => true, 'data' => $orders]);
     }
 }

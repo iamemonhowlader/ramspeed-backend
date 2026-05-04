@@ -16,6 +16,14 @@ use App\Http\Controllers\Admin\AdminSupplierController;
 use App\Http\Controllers\Admin\AdminMemberController;
 use App\Http\Controllers\Admin\AdminExpenseController;
 use App\Http\Controllers\Admin\AdminMenuController;
+use App\Http\Controllers\Admin\AdminStockController;
+use App\Http\Controllers\Admin\AdminReceiptController;
+use App\Http\Controllers\Admin\AdminBalanceSheetController;
+use App\Http\Controllers\Admin\AdminStoreInfoController;
+use App\Http\Controllers\Admin\AdminRmaController;
+use App\Http\Controllers\Admin\LogoController;
+use App\Http\Controllers\Admin\AdminUserController;
+use App\Http\Controllers\Admin\AccessLevelController;
 
 /*
 |--------------------------------------------------------------------------
@@ -82,21 +90,64 @@ Route::prefix('admin')->group(function () {
     Route::post('/orders/toggle-status/{id}', [AdminOrderController::class, 'toggleStatus']);
     Route::get('/orders/invoice/{id}', [AdminOrderController::class, 'invoice']);
     Route::get('/orders/pdf/{id}', [AdminOrderController::class, 'pdf']);
-    Route::get('/orders-export/pdf', [AdminOrderController::class, 'exportPdf']);
     Route::get('/orders-export/trial-balance', [AdminOrderController::class, 'trialBalance']);
     Route::post('/orders/add-extra-product/{orderId}', [AdminOrderController::class, 'addExtraProduct']);
-    
-    // Supplier Management
-    Route::get('/suppliers', [AdminSupplierController::class, 'index']);
-    Route::post('/suppliers/store', [AdminSupplierController::class, 'store']);
-    Route::post('/suppliers/update/{id}', [AdminSupplierController::class, 'update']);
 
     // Member Management (Newly Added)
     Route::get('/members', [AdminMemberController::class, 'index']);
+    Route::get('/members/{id}', [AdminMemberController::class, 'show']);
+    Route::post('/members/store', [AdminMemberController::class, 'store']);
     Route::post('/members/update/{id}', [AdminMemberController::class, 'update']);
+    Route::post('/members/toggle-b2b-approval/{id}', [AdminMemberController::class, 'toggleB2bApproval']);
     Route::delete('/members/delete/{id}', [AdminMemberController::class, 'destroy']);
+
+    // Admin User Management
+    Route::get('/users', [AdminUserController::class, 'index']);
+    Route::get('/users/{id}', [AdminUserController::class, 'show']);
+    Route::post('/users/store', [AdminUserController::class, 'store']);
+    Route::post('/users/update/{id}', [AdminUserController::class, 'update']);
+    Route::delete('/users/delete/{id}', [AdminUserController::class, 'destroy']);
+
+    // Access Level Management
+    Route::get('/access-levels', [AccessLevelController::class, 'index']);
+    Route::get('/access-levels/{id}', [AccessLevelController::class, 'show']);
+    Route::post('/access-levels/store', [AccessLevelController::class, 'store']);
+    Route::post('/access-levels/update/{id}', [AccessLevelController::class, 'update']);
+    Route::delete('/access-levels/delete/{id}', [AccessLevelController::class, 'destroy']);
+
+    // Supplier Management
+    Route::get('/suppliers', [AdminSupplierController::class, 'index']);
+    Route::get('/suppliers/{id}', [AdminSupplierController::class, 'show']);
+    Route::post('/suppliers/store', [AdminSupplierController::class, 'store']);
+    Route::post('/suppliers/update/{id}', [AdminSupplierController::class, 'update']);
+    Route::delete('/suppliers/delete/{id}', [AdminSupplierController::class, 'destroy']);
 
     // Expense & VAT Management (Newly Added)
     Route::get('/expenses', [AdminExpenseController::class, 'index']);
     Route::post('/expenses/toggle-status', [AdminExpenseController::class, 'toggleStatus']);
+
+    // Stock Management
+    Route::get('/stock', [AdminStockController::class, 'index']);
+
+    // Receipt Management
+    Route::get('/receipts', [AdminReceiptController::class, 'index']);
+    Route::post('/receipts/store', [AdminReceiptController::class, 'store']);
+    Route::get('/receipts/{id}/print', [AdminReceiptController::class, 'printReceipt']);
+
+    // Balance Sheets
+    Route::get('/balance-sheets/{quarter}', [AdminBalanceSheetController::class, 'getQuarterlyData']);
+
+    // Store Info
+    Route::get('/store-info', [AdminStoreInfoController::class, 'index']);
+    Route::post('/store-info/update', [AdminStoreInfoController::class, 'update']);
+
+    // RMA History
+    Route::get('/rma-history', [AdminRmaController::class, 'index']);
+    Route::get('/rma-history/{id}', [AdminRmaController::class, 'show']);
+    Route::post('/rma-history/update/{id}', [AdminRmaController::class, 'update']);
+    Route::post('/rma-history/toggle-delivered/{id}', [AdminRmaController::class, 'toggleDelivered']);
+
+    // Logo Management
+    Route::get('/logo', [LogoController::class, 'index']);
+    Route::post('/logo/update', [LogoController::class, 'update']);
 });

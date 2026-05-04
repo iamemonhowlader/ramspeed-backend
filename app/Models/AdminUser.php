@@ -2,20 +2,17 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-
 use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 
 class AdminUser extends Authenticatable implements JWTSubject
 {
-    use HasFactory, Notifiable;
-
-    public $timestamps = false;
+    use Notifiable;
 
     protected $table = 'admin_users';
-    
+    public $timestamps = false;
+
     protected $fillable = [
         'username',
         'password',
@@ -27,23 +24,7 @@ class AdminUser extends Authenticatable implements JWTSubject
 
     protected $hidden = [
         'password',
-        'remember_token',
     ];
-
-    public function accessLevel()
-    {
-        return $this->hasOne(AccessLevel::class, 'uid');
-    }
-
-    public function userLogs()
-    {
-        return $this->hasMany(UserLog::class, 'username', 'username');
-    }
-
-    public function scopeActive($query)
-    {
-        return $query->where('active', 'yes');
-    }
 
     public function getJWTIdentifier()
     {
@@ -56,10 +37,5 @@ class AdminUser extends Authenticatable implements JWTSubject
             'user_type' => $this->user_type,
             'source_table' => 'admin_users'
         ];
-    }
-
-    public function supplierInfo()
-    {
-        return $this->hasOne(Supplier::class, 'user_id');
     }
 }

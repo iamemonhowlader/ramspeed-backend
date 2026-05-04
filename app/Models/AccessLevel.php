@@ -2,32 +2,28 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class AccessLevel extends Model
 {
-    use HasFactory;
-
-    public $timestamps = false;
-
     protected $table = 'access_level';
+    public $timestamps = false;
 
     protected $fillable = [
         'uid',
-        'cpanel',
-        'users',
-        'orders',
-        'products',
-        'categories',
-        'suppliers',
+        'menu',
+        'featured',
+        'news',
         'shipping',
-        'content',
-        'gallery',
-        'settings'
+        'banlist',
+        'user_account',
+        'user_level',
+        'members',
+        'suppliers',
+        'BalanceSheet'
     ];
 
-    public function adminUser()
+    public function user()
     {
         return $this->belongsTo(AdminUser::class, 'uid');
     }

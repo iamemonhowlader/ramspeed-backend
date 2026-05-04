@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\AdminUser;
-use App\Models\SupplierInfo;
+use App\Models\Supplier;
 use App\Models\Product;
 use App\Services\CurrencyService;
 use Illuminate\Http\Request;
@@ -38,7 +38,7 @@ class AdminSupplierController extends Controller
                 'user_type' => 'supplier'
             ]);
 
-            SupplierInfo::create([
+            Supplier::create([
                 'user_id' => $user->id,
                 'username' => $request->username,
                 'full_name' => $request->name,
@@ -70,9 +70,9 @@ class AdminSupplierController extends Controller
     public function update(Request $request, $id)
     {
         $user = AdminUser::findOrFail($id);
-        $info = SupplierInfo::where('user_id', $id)->first();
+        $info = Supplier::where('user_id', $id)->first();
 
-        $recalculate = ($request->cyprofit != $info->cyprofit || $request->cytax != $info->cytax);
+        $recalculate = ($info && ($request->cyprofit != $info->cyprofit || $request->cytax != $info->cytax));
 
         if ($request->active == 'no' && $user->active == 'yes') {
             Product::where('supplier_id', $id)->update(['active' => 'no']);
@@ -104,6 +104,27 @@ class AdminSupplierController extends Controller
 
             DB::commit();
             return response()->json(['success' => true, 'message' => 'Supplier updated successfully']);
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    public function show($id)
+    {
+        $user = AdminUser::findOrFail($id);
+        $info = Supplier::where('user_id', $id)->first();
+        return response()->json(['success' => true, 'data' => array_merge($user->toArray(), $info ? $info->toArray() : [])]);
+    }
+
+    public function destroy($id)
+    {
+        DB::beginTransaction();
+        try {
+            Supplier::where('user_id', $id)->delete();
+            AdminUser::destroy($id);
+            DB::commit();
+            return response()->json(['success' => true, 'message' => 'Supplier deleted successfully']);
         } catch (\Exception $e) {
             DB::rollback();
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);

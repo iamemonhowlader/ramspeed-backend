@@ -3,73 +3,57 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
-use App\Models\Product;
-use App\Models\SupplierDiscount;
+use App\Models\Cart;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Auth;
 
 class CartController extends Controller
 {
-    public function index()
+    public function getCart()
     {
-        $cart = Session::get('cart', []);
-        $storeType = Session::get('store_type', 1);
-        
-        return response()->json([
-            'success' => true,
-            'cart' => $cart,
-            'store_type' => $storeType
-        ]);
+        $user = auth('api')->user();
+        if (!$user) return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
+
+        $cartItems = Cart::where('member_id', $user->id)->get();
+        return response()->json(['success' => true, 'data' => $cartItems]);
     }
 
-    public function add(Request $request)
+    public function addItem(Request $request)
     {
-        $productId = $request->product_id;
-        $quantity = $request->quantity;
-        $storeType = $request->store_type;
+        $user = auth('api')->user();
+        if (!$user) return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
 
-        $cart = Session::get('cart', []);
+        $item = Cart::updateOrCreate(
+            ['member_id' => $user->id, 'product_id' => $request->product_id, 'store_type' => $request->store_type ?? 2],
+            [
+                'quantity' => $request->quantity,
+                'price' => $request->price,
+                'supplier_id' => $request->supplier_id ?? 0
+            ]
+        );
 
-        // 1. Validate Store Type (Mixing logic from cart.php lines 55-80)
-        if (!empty($cart)) {
-            $firstItem = reset($cart);
-            if ($firstItem['store_type'] != $storeType) {
-                return response()->json([
-                    'success' => false, 
-                    'message' => 'Mixing store types in cart is not allowed.'
-                ], 422);
-            }
-        }
-
-        $product = Product::findOrFail($productId);
-        
-        // 2. Min Quantity Check
-        if ($quantity < ($product->minquantity ?? 1)) {
-            $quantity = $product->minquantity ?? 1;
-        }
-
-        // 3. Add or Update Cart
-        $cart[$productId] = [
-            'id' => $product->id,
-            'name' => $product->name,
-            'quantity' => $quantity,
-            'price' => $product->price,
-            'store_type' => $storeType,
-            'supplier_id' => $product->supplier_id
-        ];
-
-        Session::put('cart', $cart);
-        Session::put('store_type', $storeType);
-
-        return response()->json(['success' => true, 'message' => 'Product added to cart', 'cart' => $cart]);
+        return response()->json(['success' => true, 'data' => $item]);
     }
 
-    public function remove($id)
+    public function removeItem(Request $request)
     {
-        $cart = Session::get('cart', []);
-        unset($cart[$id]);
-        Session::put('cart', $cart);
-        
-        return response()->json(['success' => true, 'message' => 'Product removed', 'cart' => $cart]);
+        $user = auth('api')->user();
+        if (!$user) return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
+
+        Cart::where('member_id', $user->id)
+            ->where('product_id', $request->product_id)
+            ->delete();
+
+        return response()->json(['success' => true]);
+    }
+
+    public function clearCart()
+    {
+        $user = auth('api')->user();
+        if (!$user) return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
+
+        Cart::where('member_id', $user->id)->delete();
+
+        return response()->json(['success' => true]);
     }
 }

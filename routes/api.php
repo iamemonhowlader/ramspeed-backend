@@ -24,6 +24,8 @@ use App\Http\Controllers\Admin\AdminRmaController;
 use App\Http\Controllers\Admin\LogoController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\AccessLevelController;
+use App\Http\Controllers\Admin\AdminAdvertisementController;
+use App\Http\Controllers\Admin\AdminNewsletterController;
 
 /*
 |--------------------------------------------------------------------------
@@ -42,19 +44,19 @@ Route::prefix('frontend')->group(function () {
     Route::get('/products', [ProductController::class, 'index']);
     Route::get('/products/{id}', [ProductController::class, 'show']);
     Route::get('/categories', [ProductController::class, 'categories']);
-    
+
     Route::get('/cart', [CartController::class, 'getCart']);
     Route::post('/cart/add', [CartController::class, 'addItem']);
     Route::post('/cart/remove', [CartController::class, 'removeItem']);
     Route::post('/cart/clear', [CartController::class, 'clearCart']);
-    
+
     Route::get('/wishlist', [WishlistController::class, 'index']);
     Route::post('/wishlist/toggle', [WishlistController::class, 'toggle']);
-    
+
     Route::post('/register/member', [RegistrationController::class, 'registerMember']);
     Route::post('/register/wholesaler', [RegistrationController::class, 'registerWholesaler']);
     Route::get('/register/confirm', [RegistrationController::class, 'confirm'])->name('register.confirm');
-    
+
     Route::get('/account', [AccountController::class, 'index']);
     Route::post('/account/update', [AccountController::class, 'update']);
     Route::get('/clients', [AccountController::class, 'getClients']);
@@ -74,14 +76,14 @@ Route::prefix('admin')->group(function () {
     Route::post('/products/store', [AdminProductController::class, 'store']);
     Route::post('/products/update/{id}', [AdminProductController::class, 'update']);
     Route::delete('/products/delete/{id}', [AdminProductController::class, 'destroy']);
-    
+
     // Menu Management
     Route::get('/menu', [AdminMenuController::class, 'index']);
     Route::get('/menu/{id}', [AdminMenuController::class, 'show']);
     Route::post('/menu/store', [AdminMenuController::class, 'store']);
     Route::post('/menu/update/{id}', [AdminMenuController::class, 'update']);
     Route::delete('/menu/delete/{id}', [AdminMenuController::class, 'destroy']);
-    
+
     // Order Management
     Route::get('/orders', [AdminOrderController::class, 'index']);
     Route::get('/orders/{id}', [AdminOrderController::class, 'show']);
@@ -146,6 +148,22 @@ Route::prefix('admin')->group(function () {
     Route::get('/rma-history/{id}', [AdminRmaController::class, 'show']);
     Route::post('/rma-history/update/{id}', [AdminRmaController::class, 'update']);
     Route::post('/rma-history/toggle-delivered/{id}', [AdminRmaController::class, 'toggleDelivered']);
+
+    // Advertisement Management
+    Route::get('/advertisements', [AdminAdvertisementController::class, 'index']);
+    Route::get('/advertisements/{id}', [AdminAdvertisementController::class, 'show']);
+    Route::post('/advertisements/store', [AdminAdvertisementController::class, 'store']);
+    Route::post('/advertisements/update/{id}', [AdminAdvertisementController::class, 'update']);
+    Route::post('/advertisements/toggle-status/{id}', [AdminAdvertisementController::class, 'toggleStatus']);
+    Route::delete('/advertisements/delete/{id}', [AdminAdvertisementController::class, 'destroy']);
+    Route::get('/advertisements/location/{location}', [AdminAdvertisementController::class, 'getByLocation']);
+
+    // Newsletter Management
+    Route::get('/newsletters', [AdminNewsletterController::class, 'index']);
+    Route::get('/newsletters/{id}', [AdminNewsletterController::class, 'show']);
+    Route::post('/newsletters/store', [AdminNewsletterController::class, 'store']);
+    Route::delete('/newsletters/delete/{id}', [AdminNewsletterController::class, 'destroy']);
+    Route::delete('/newsletters/delete-multiple', [AdminNewsletterController::class, 'destroyMultiple']);
 
     // Logo Management
     Route::get('/logo', [LogoController::class, 'index']);
